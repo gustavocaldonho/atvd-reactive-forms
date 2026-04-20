@@ -1,0 +1,290 @@
+<div class="container">
+  <div class="form-wrapper">
+    <h1 class="title">Ficha de Matrícula</h1>
+    <p class="subtitle">Preencha os dados abaixo para se matricular</p>
+
+    <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()" class="form">
+      <!-- Nome Completo -->
+      <div class="form-group">
+        <label for="nomeCompleto" class="label">
+          Nome Completo <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="nomeCompleto"
+          formControlName="nomeCompleto"
+          class="input"
+          [class.input-error]="
+            nomeCompleto && nomeCompleto.invalid && (nomeCompleto.dirty || nomeCompleto.touched)
+          "
+          placeholder="Digite seu nome completo"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            nomeCompleto && nomeCompleto.invalid && (nomeCompleto.dirty || nomeCompleto.touched)
+          "
+        >
+          {{ obterMensagemErroNome() }}
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="label"> E-mail <span class="required">*</span> </label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="input"
+          [class.input-error]="email && email.invalid && (email.dirty || email.touched)"
+          placeholder="Digite seu e-mail"
+        />
+        <div class="error-message" *ngIf="email && email.invalid && (email.dirty || email.touched)">
+          {{ obterMensagemErroEmail() }}
+        </div>
+      </div>
+
+      <!-- Telefones -->
+      <div class="form-group">
+        <label class="label"> Telefone <span class="required">*</span> </label>
+        <div formArrayName="telefones" class="telefones-group">
+          <div
+            *ngFor="let telefoneControl of telefones.controls; let i = index"
+            class="telefone-item"
+            [formGroupName]="i"
+          >
+            <input
+              type="tel"
+              formControlName="telefone"
+              appTelefoneMask
+              class="input"
+              [class.input-error]="
+                telefoneControl.get('telefone')?.invalid &&
+                (telefoneControl.get('telefone')?.dirty || telefoneControl.get('telefone')?.touched)
+              "
+              placeholder="Digite o telefone (ex: (11) 98765-4321)"
+            />
+            <button
+              type="button"
+              class="btn-remove"
+              (click)="removerTelefone(i)"
+              [disabled]="telefones.length === 1"
+              title="Remover telefone"
+            >
+              ✕
+            </button>
+            <div
+              class="error-message"
+              *ngIf="
+                telefoneControl.get('telefone')?.invalid &&
+                (telefoneControl.get('telefone')?.dirty || telefoneControl.get('telefone')?.touched)
+              "
+            >
+              Telefone inválido
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-add-phone"
+          (click)="adicionarTelefone()"
+          title="Adicionar mais um telefone"
+        >
+          + Adicionar Telefone
+        </button>
+        <div
+          class="error-message"
+          *ngIf="telefones.hasError('phonesRequired') && (telefones.dirty || telefones.touched)"
+        >
+          Pelo menos um telefone é obrigatório
+        </div>
+      </div>
+
+      <!-- Idade -->
+      <div class="form-group">
+        <label for="idade" class="label"> Idade <span class="required">*</span> </label>
+        <input
+          type="number"
+          id="idade"
+          formControlName="idade"
+          class="input"
+          [class.input-error]="idade && idade.invalid && (idade.dirty || idade.touched)"
+          placeholder="Digite sua idade"
+          min="18"
+        />
+        <div class="error-message" *ngIf="idade && idade.invalid && (idade.dirty || idade.touched)">
+          {{ obterMensagemErroIdade() }}
+        </div>
+      </div>
+
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="password" class="label"> Senha <span class="required">*</span> </label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="input"
+          [class.input-error]="password && password.invalid && (password.dirty || password.touched)"
+          placeholder="Digite sua senha"
+        />
+        <div
+          class="error-message"
+          *ngIf="password && password.invalid && (password.dirty || password.touched)"
+        >
+          {{ obterMensagemErroSenha() }}
+        </div>
+      </div>
+
+      <!-- Confirmar Senha -->
+      <div class="form-group">
+        <label for="confirmPassword" class="label">
+          Confirmar Senha <span class="required">*</span>
+        </label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          class="input"
+          [class.input-error]="
+            (confirmPassword &&
+              confirmPassword.invalid &&
+              (confirmPassword.dirty || confirmPassword.touched)) ||
+            (formulario.hasError('confirmPasswordMismatch') &&
+              (confirmPassword?.dirty || confirmPassword?.touched))
+          "
+          placeholder="Confirme sua senha"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            (confirmPassword &&
+              confirmPassword.invalid &&
+              (confirmPassword.dirty || confirmPassword.touched)) ||
+            (formulario.hasError('confirmPasswordMismatch') &&
+              (confirmPassword?.dirty || confirmPassword?.touched))
+          "
+        >
+          {{ obterMensagemErroConfirmarSenha() }}
+        </div>
+      </div>
+
+      <!-- Gênero -->
+      <div class="form-group">
+        <label class="label"> Gênero <span class="required">*</span> </label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="masculino" value="Masculino" formControlName="genero" />
+            <label for="masculino" class="radio-label">Masculino</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="feminino" value="Feminino" formControlName="genero" />
+            <label for="feminino" class="radio-label">Feminino</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="outro" value="Outro" formControlName="genero" />
+            <label for="outro" class="radio-label">Outro</label>
+          </div>
+        </div>
+        <div
+          class="error-message"
+          *ngIf="genero && genero.invalid && (genero.dirty || genero.touched)"
+        >
+          Gênero é obrigatório
+        </div>
+      </div>
+
+      <!-- Cidade -->
+      <div class="form-group">
+        <label for="cidade" class="label"> Cidade <span class="required">*</span> </label>
+        <select
+          id="cidade"
+          formControlName="cidade"
+          class="input"
+          [class.input-error]="cidade && cidade.invalid && (cidade.dirty || cidade.touched)"
+        >
+          <option value="">Selecione uma cidade</option>
+          <option *ngFor="let c of cidades" [value]="c">{{ c }}</option>
+        </select>
+        <div
+          class="error-message"
+          *ngIf="cidade && cidade.invalid && (cidade.dirty || cidade.touched)"
+        >
+          Cidade é obrigatória
+        </div>
+      </div>
+
+      <!-- Aceitar Termos -->
+      <div class="form-group checkbox-group">
+        <div class="checkbox-item">
+          <input
+            type="checkbox"
+            id="aceitaTermos"
+            formControlName="aceitaTermos"
+            class="checkbox"
+            [class.checkbox-error]="
+              aceitaTermos && aceitaTermos.invalid && (aceitaTermos.dirty || aceitaTermos.touched)
+            "
+          />
+          <label for="aceitaTermos" class="checkbox-label">
+            Aceito os termos e condições <span class="required">*</span>
+          </label>
+        </div>
+        <div
+          class="error-message"
+          *ngIf="
+            aceitaTermos && aceitaTermos.invalid && (aceitaTermos.dirty || aceitaTermos.touched)
+          "
+        >
+          Você deve aceitar os termos para continuar
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="button-group">
+        <button type="submit" class="btn-submit" [disabled]="formulario.invalid">Cadastrar</button>
+        <button type="button" class="btn-reset" (click)="limparFormulario()">Limpar</button>
+      </div>
+    </form>
+
+    <!-- Resumo dos Dados Enviados -->
+    <div class="resumo-container" *ngIf="formularioEnviado">
+      <h2 class="resumo-title">✓ Matrícula Realizada com Sucesso!</h2>
+      <div class="resumo-card">
+        <div class="resumo-item">
+          <span class="resumo-label">Nome Completo:</span>
+          <span class="resumo-value">{{ formularioEnviado.nomeCompleto }}</span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">E-mail:</span>
+          <span class="resumo-value">{{ formularioEnviado.email }}</span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">Telefone(s):</span>
+          <span class="resumo-value">
+            {{ formularioEnviado.telefones.join(', ') }}
+          </span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">Idade:</span>
+          <span class="resumo-value">{{ formularioEnviado.idade }} anos</span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">Gênero:</span>
+          <span class="resumo-value">{{ formularioEnviado.genero }}</span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">Cidade:</span>
+          <span class="resumo-value">{{ formularioEnviado.cidade }}</span>
+        </div>
+        <div class="resumo-item">
+          <span class="resumo-label">Termos Aceitos:</span>
+          <span class="resumo-value">
+            {{ formularioEnviado.aceitaTermos ? 'Sim' : 'Não' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
