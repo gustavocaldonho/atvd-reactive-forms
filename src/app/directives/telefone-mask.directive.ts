@@ -9,21 +9,14 @@ export class TelefoneMaskDirective {
   constructor(private ngControl: NgControl) {}
 
   @HostListener('ngModelChange', ['$event'])
-  onModelChange(event: string) {
-    this.onInputChange(event, true);
+  onModelChange(value: any) {
+    this.maskPhoneNumber(value);
   }
 
   @HostListener('keyup.backspace', ['$event'])
-  keyUpBackspace(event: KeyboardEvent) {
-    this.onInputChange(event.target as HTMLInputElement, false);
-  }
-
-  onInputChange(event: any, isModelChange: boolean) {
-    if (isModelChange) {
-      this.maskPhoneNumber(event);
-    } else {
-      this.maskPhoneNumber(event.value);
-    }
+  keyUpBackspace(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.maskPhoneNumber(input.value);
   }
 
   maskPhoneNumber(value: string) {
